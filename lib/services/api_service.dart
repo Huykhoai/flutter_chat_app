@@ -6,7 +6,7 @@ class ApiService {
   static String baseUrl = "http://192.168.88.52:3000";
 
   static Future<Map<String, dynamic>> login(String email, String password) async{
-    final url = Uri.parse("$baseUrl/api/post/signin");
+    final url = Uri.parse("$baseUrl/api/post/sign_in");
     final body = jsonEncode({
       'email':email,
       'password':password
@@ -21,7 +21,9 @@ class ApiService {
       );
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
-      } else {
+      } else if(response.statusCode == 401) {
+        return jsonDecode(response.body);
+      }else{
         throw Exception("Failed to login: ${response.statusCode}");
       }
     }catch(e){
