@@ -1,12 +1,9 @@
-import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_app/baseScreen/baseScreen.dart';
 import 'package:flutter_chat_app/item/item_list_user_online.dart';
 import 'package:flutter_chat_app/model/user_response.dart';
+import 'package:flutter_chat_app/screen/searchScreen.dart';
 import 'package:flutter_chat_app/services/api_service.dart';
-import 'package:flutter_chat_app/model/user_response.dart';
 class Home extends Basescreen{
   const Home(this.user, {Key? key}) : super(key: key);
   final User user;
@@ -41,21 +38,21 @@ class _HomeState extends BaseScreenState<Home>{
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          leadingWidth: 10,
+          backgroundColor: Colors.white,
           leading: const SizedBox(),
-          title: Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: CircleAvatar(backgroundImage: NetworkImage(replaceLocalhost(widget.user.avatar)),)
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
                 ),
-                const SizedBox(width: 20),
-                const Text("Danh Sách Tin Nhắn"),
-              ],
-            ),
+                child: CircleAvatar(backgroundImage: NetworkImage(replaceLocalhost(widget.user.avatar)),)
+              ),
+              const SizedBox(width: 20),
+              const Text("Danh Sách Tin Nhắn"),
+            ],
           ),
           centerTitle: true,
         ),
@@ -65,17 +62,56 @@ class _HomeState extends BaseScreenState<Home>{
               height: 10,
             ),
             // Thanh tìm kiếm
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Tìm kiếm...',
-                  prefixIcon: const Icon(Icons.search),
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[300]!,
+            Container(
+              height: 35,
+              margin: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.grey,
+                  width: 1.4
+                ),
+                borderRadius: BorderRadius.circular(25)
+              ),
+              child: InkWell(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context){
+                    return const SearchPage();
+                  }));
+                },
+                borderRadius: BorderRadius.circular(25),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Row(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.0),
+                          child: Icon(Icons.search,
+                          color: Colors.grey,),
+                        ),
+                        Text("Find Products", style: TextStyle(
+                            color: Colors.grey
+                        ),
+                        )
+                      ],
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.orange,
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      height: 32,
+                      width: 75,
+                      child: const Center(
+                        child: Text(
+                          "Search",
+                          style: TextStyle(
+                            color: Colors.white
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
                 ),
               ),
             ),

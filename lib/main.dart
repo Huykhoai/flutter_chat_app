@@ -1,11 +1,5 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'dart:convert';
-
-import 'package:flutter_chat_app/screen/home.dart';
 import 'package:flutter_chat_app/screen/login.dart';
-import 'package:flutter_chat_app/screen/register.dart';
 
 void main() {
   runApp(const MyApp());
