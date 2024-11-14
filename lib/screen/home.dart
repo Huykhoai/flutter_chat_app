@@ -2,35 +2,30 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_app/item/item_list_message.dart';
-
-import '../model/coffee.dart';
-import 'package:http/http.dart' as http;
-
-class Home extends StatefulWidget{
-  const Home({super.key});
-
+import 'package:flutter_chat_app/baseScreen/baseScreen.dart';
+import 'package:flutter_chat_app/item/item_list_user_online.dart';
+import 'package:flutter_chat_app/model/user_response.dart';
+import 'package:flutter_chat_app/services/api_service.dart';
+import 'package:flutter_chat_app/model/user_response.dart';
+class Home extends Basescreen{
+  const Home(this.user, {Key? key}) : super(key: key);
+  final User user;
   @override
-  _HomeState createState() {
-    return _HomeState();
-  }
+  _HomeState createState() => _HomeState();
 
 }
-class _HomeState extends State<Home> with TickerProviderStateMixin {
-  List<Coffee> coffees = [];
+class _HomeState extends BaseScreenState<Home>{
+  List<User> users = [];
 
   Future<void> fetchData() async {
-    final url = Uri.parse("https://api.sampleapis.com/coffee/hot");
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      List<dynamic> data = jsonDecode(response.body);
+    final response = await ApiService.getAllUser();
+    if (response['status'] == 200) {
       setState(() {
-        coffees = data.map((item) => Coffee.fromJson(item)).toList();
+        users = parseUsers(response);
       });
     } else {
       setState(() {
-        coffees = [];
+        users = [];
       });
     }
   }
@@ -42,51 +37,91 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildScreen(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-          appBar: AppBar(
-            leading: const SizedBox(),
-            title: const Text("Danh Sách Tin Nhắn"),
-            centerTitle: true,
-          ),
-          body: Expanded(
-            child: Column(
+        appBar: AppBar(
+          leading: const SizedBox(),
+          title: Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const SizedBox(
-                  height: 10,
-                ),
-                // Thanh tìm kiếm
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Tìm kiếm...',
-                      prefixIcon: const Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                    ),
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
                   ),
+                  child: CircleAvatar(backgroundImage: NetworkImage(replaceLocalhost(widget.user.avatar)),)
                 ),
-                const SizedBox(height: 10,),
-                // Danh sách tin nhắn
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: coffees.length,
-                    itemBuilder: (context, index) {
-                      final coffee = coffees[index];
-                      return InkWell(
-                        child: ItemListMessage(
-                            coffee
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                const SizedBox(width: 20),
+                const Text("Danh Sách Tin Nhắn"),
               ],
-            ),)
+            ),
+          ),
+          centerTitle: true,
+        ),
+        body: Column(
+          children: [
+            const SizedBox(
+              height: 10,
+            ),
+            // Thanh tìm kiếm
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Tìm kiếm...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[300]!,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            SizedBox(
+              height: 100,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: users.length,
+                itemBuilder: (context, index) {
+                  final user = users[index];
+                  return ItemListUserOnline(user);
+                },
+              ),
+            ),
+
+            Expanded(
+              child: ListView.builder(
+                itemCount: users.length,
+                itemBuilder: (context, index) {
+                  final user = users[index];
+                  return ListTile(
+                    title: Text(
+                      user.name,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 18),
+                    ),
+                    leading: CircleAvatar(
+                      backgroundImage: NetworkImage(replaceLocalhost(user.avatar)),
+                      radius: 30,
+                    ),
+                    subtitle: Text(
+                      user.numberPhone,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+
 }

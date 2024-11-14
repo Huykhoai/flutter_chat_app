@@ -1,11 +1,11 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_app/model/coffee.dart';
 import 'dart:convert';
 
 import 'package:flutter_chat_app/screen/home.dart';
 import 'package:flutter_chat_app/screen/login.dart';
+import 'package:flutter_chat_app/screen/register.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,11 +25,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const LoginScreen(),
-        '/home': (context) => const Home()
-      },
+      home: const LoginScreen(),
     );
   }
 }

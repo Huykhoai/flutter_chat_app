@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter_chat_app/model/register.dart';
 import 'package:http/http.dart'as http;
 
 class ApiService {
@@ -19,13 +20,31 @@ class ApiService {
           },
           body: body
       );
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else if(response.statusCode == 401) {
-        return jsonDecode(response.body);
-      }else{
-        throw Exception("Failed to login: ${response.statusCode}");
-      }
+      return jsonDecode(response.body);
+    }catch(e){
+      throw Exception("Failed to connect to the server: ${e}");
+    }
+  }
+  static Future<Map<String,dynamic>> register(Register register) async{
+    final url = Uri.parse("$baseUrl/api/post/create_user");
+    try{
+      final response = await http.post(
+        url,
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: jsonEncode(register.toJson()));
+
+      return jsonDecode(response.body);
+    }catch(e){
+      throw Exception("Failed to connect to the server: ${e}");
+    }
+  }
+  static Future<Map<String, dynamic>> getAllUser() async{
+    final url = Uri.parse("$baseUrl/api/get/all_user");
+    try{
+      final response = await http.get(url);
+      return jsonDecode(response.body);
     }catch(e){
       throw Exception("Failed to connect to the server: ${e}");
     }

@@ -1,16 +1,22 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_app/baseScreen/baseScreen.dart';
+import 'package:flutter_chat_app/model/user_response.dart';
+import 'package:flutter_chat_app/screen/home.dart';
+import 'package:flutter_chat_app/screen/register.dart';
 import 'package:flutter_chat_app/services/api_service.dart';
 
 import '../animation/FadeAnimation.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends Basescreen {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends BaseScreenState<LoginScreen> {
    final TextEditingController _emailController = TextEditingController();
    final TextEditingController _passwordController = TextEditingController();
    RegExp emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
@@ -50,7 +56,10 @@ class _LoginScreenState extends State<LoginScreen> {
           setState(() {
             isLoading = false;
           });
-          Navigator.pushReplacementNamed(context, '/home');
+          final User user = User.fromJson(response['data']);
+          Navigator.push(context, MaterialPageRoute(builder: (context){
+            return Home(user);
+          }));
         }else if(response['status'] ==  401){
           await Future.delayed(const Duration(seconds: 3));
           setState(() {
@@ -60,6 +69,10 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       }catch(e){
         print(e);
+        await Future.delayed(const Duration(seconds: 3));
+        setState(() {
+          isLoading = false;
+        });
       }
     }else {
       setState(() {
@@ -73,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
      });
    }
   @override
-  Widget build(BuildContext context) {
+  Widget buildScreen(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -98,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      FadeAnimation(1, Text("Login", style: TextStyle(color: Colors.white,fontSize: 40),)),
+                      FadeAnimation(1, Text("Sign In", style: TextStyle(color: Colors.white,fontSize: 40),)),
                       SizedBox(height: 10,),
                       FadeAnimation(1.3,Text("Welcome Back", style: TextStyle(color: Colors.white,fontSize: 18),))
                     ]
@@ -208,11 +221,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                       ),
                       const SizedBox(height: 20,),
-                      const Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          FadeAnimation(1.7, Text("Don't have an account yet? ",style: TextStyle(color: Colors.grey),)),
-                          FadeAnimation(1.7, Text("Register ",style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),))
+                          const FadeAnimation(1.7, Text("Don't have an account yet? ",style: TextStyle(color: Colors.grey),)),
+                          FadeAnimation(1.7, GestureDetector(
+                              child: const Text("Sign Up ",style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),),
+                            onTap: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context){
+                                  return const RegisterScreen();
+                                }));
+                            },
+                          )
+                          )
                         ],
                       ),
                       const SizedBox(height: 10,),

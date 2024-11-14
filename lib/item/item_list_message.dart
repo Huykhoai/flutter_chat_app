@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_app/model/coffee.dart';
+import 'package:flutter_chat_app/baseScreen/baseScreen.dart';
 import 'package:flutter_chat_app/screen/message.dart';
 
-class ItemListMessage extends StatefulWidget {
-  const ItemListMessage(this.coffee, {super.key});
-  final Coffee coffee;
+class ItemListMessage extends Basescreen {
+  const ItemListMessage( {super.key});
   @override
-  State<ItemListMessage> createState() => _ItemListMessageState();
+  _ItemListMessageState createState() => _ItemListMessageState();
 }
 
-class _ItemListMessageState extends State<ItemListMessage> {
+class _ItemListMessageState extends BaseScreenState<ItemListMessage> {
   @override
-  Widget build(BuildContext context) {
+  Widget buildScreen(BuildContext context) {
     return GestureDetector(
       child: Container(
         padding: const EdgeInsets.all(10),
@@ -27,7 +26,7 @@ class _ItemListMessageState extends State<ItemListMessage> {
               height: 50,
               clipBehavior: Clip.hardEdge,
               decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(50))),
-              child: Image.network(widget.coffee.image,fit: BoxFit.fill,),
+              //child: ,
             ),
             const SizedBox(
               width: 10,
@@ -36,12 +35,12 @@ class _ItemListMessageState extends State<ItemListMessage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(widget.coffee.title
-                  ,style:
-                    const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    fontSize: 20),),
-                  Text(widget.coffee.description)
+                  // Text(widget.coffee.title
+                  // ,style:
+                  //   const TextStyle(
+                  //     fontWeight: FontWeight.bold,
+                  //   fontSize: 20),),
+                  // Text(widget.coffee.description)
                 ],
               ),
             )
@@ -49,9 +48,9 @@ class _ItemListMessageState extends State<ItemListMessage> {
         )
       ),
       onTap: (){
-        Navigator.push(context, MaterialPageRoute(builder: (context){
-          return Message(widget.coffee);
-        }));
+        // Navigator.push(context, MaterialPageRoute(builder: (context){
+        //   return Message(widget.coffee);
+        // }));
       },
     );
   }
