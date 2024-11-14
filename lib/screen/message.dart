@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_app/model/coffee.dart';
+
 import 'package:image_slide_show/image_slide_show.dart';
 
 class Message extends StatefulWidget {
-  const Message(this.coffee,{super.key});
-  final Coffee coffee;
+  const Message({super.key});
   @override
   State<Message> createState() => _MessageState();
 }
@@ -47,10 +46,10 @@ class _MessageState extends State<Message> {
                   Navigator.pop(context);
                 },),
               const SizedBox(width: 10,),
-                CircleAvatar(backgroundImage: NetworkImage(widget.coffee.image),
-                radius: 18,),
-              const SizedBox(width:10,),
-              Text(widget.coffee.title,style: const TextStyle(fontSize: 18),)
+              //   CircleAvatar(backgroundImage: NetworkImage(),
+              //   radius: 18,),
+              // const SizedBox(width:10,),
+              // Text(,style: const TextStyle(fontSize: 18),)
             ],
           ),
         ),
