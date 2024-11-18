@@ -4,7 +4,7 @@ import 'package:flutter_chat_app/model/register.dart';
 import 'package:http/http.dart'as http;
 
 class ApiService {
-  static String baseUrl = "http://172.20.10.2:3000";
+  static String baseUrl = "http://192.168.88.52:3000";
 
   static Future<Map<String, dynamic>> login(String email, String password) async{
     final url = Uri.parse("$baseUrl/api/post/sign_in");

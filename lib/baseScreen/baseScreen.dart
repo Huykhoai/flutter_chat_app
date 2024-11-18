@@ -27,7 +27,7 @@ abstract class BaseScreenState<T extends Basescreen> extends State<T>{
     return data.map((json) => User.fromJson(json)).toList();
   }
   String replaceLocalhost(String url) {
-    String wifiIp = '172.20.10.2';
+    String wifiIp = '192.168.88.52';
     return url.replaceFirst('localhost', wifiIp);
   }
   @override
