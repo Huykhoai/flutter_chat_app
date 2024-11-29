@@ -64,4 +64,15 @@ class ApiService {
       throw Exception("Failed to connect to the server: ${e}");
     }
   }
+  static Future<Map<String, dynamic>> getMessage(List<String> room) async{
+    print("${room[0]}#${room[1]}");
+    final url = Uri.parse("$baseUrl/api/get_all_message?id_receiver=${room[0]}&id_sender=${room[1]}");
+    try{
+      final response = await http.get(url);
+      print(jsonDecode(response.body));
+      return jsonDecode(response.body);
+    }catch(e){
+      throw Exception("Failed to connect to the server: ${e}");
+    }
+  }
 }

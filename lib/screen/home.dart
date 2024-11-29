@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_app/baseScreen/baseScreen.dart';
 import 'package:flutter_chat_app/item/item_list_user_online.dart';
 import 'package:flutter_chat_app/model/user_response.dart';
+import 'package:flutter_chat_app/screen/message.dart';
 import 'package:flutter_chat_app/screen/searchScreen.dart';
 import 'package:flutter_chat_app/services/api_service.dart';
 class Home extends Basescreen{
@@ -134,22 +135,29 @@ class _HomeState extends BaseScreenState<Home>{
                 itemCount: users.length,
                 itemBuilder: (context, index) {
                   final user = users[index];
-                  return ListTile(
-                    title: Text(
-                      user.name,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 18),
+                  return GestureDetector(
+                    child: ListTile(
+                      title: Text(
+                        user.name,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 18),
+                      ),
+                      leading: CircleAvatar(
+                        backgroundImage: NetworkImage(replaceLocalhost(user.avatar)),
+                        radius: 30,
+                      ),
+                      subtitle: Text(
+                        user.numberPhone,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 14),
+                      ),
                     ),
-                    leading: CircleAvatar(
-                      backgroundImage: NetworkImage(replaceLocalhost(user.avatar)),
-                      radius: 30,
-                    ),
-                    subtitle: Text(
-                      user.numberPhone,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 14),
-                    ),
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context){
+                        return MessageScreen(user);
+                      }));
+                    },
                   );
                 },
               ),

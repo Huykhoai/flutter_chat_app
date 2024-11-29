@@ -50,13 +50,13 @@ class _LoginScreenState extends BaseScreenState<LoginScreen> {
     if (emailError.isEmpty && passwordError.isEmpty) {
       try{
         final response = await ApiService.login(emailOrPhone, password);
-        print(response);
         if(response['status'] == 200){
           await Future.delayed(const Duration(seconds: 3));
           setState(() {
             isLoading = false;
           });
           final User user = User.fromJson(response['data']);
+          saveUser(user);
           Navigator.push(context, MaterialPageRoute(builder: (context){
             return Home(user);
           }));

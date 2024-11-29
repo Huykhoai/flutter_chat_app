@@ -1,38 +1,87 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_app/baseScreen/baseScreen.dart';
+import 'package:flutter_chat_app/model/message.dart';
+import 'package:flutter_chat_app/model/user_response.dart';
+import 'package:flutter_chat_app/services/api_service.dart';
+import 'package:flutter_chat_app/ultils/socket_manager.dart';
 
 import 'package:image_slide_show/image_slide_show.dart';
 
-class Message extends StatefulWidget {
-  const Message({super.key});
+class MessageScreen extends Basescreen {
+  const MessageScreen(this.user, {super.key});
+  final User user;
   @override
-  State<Message> createState() => _MessageState();
+  _MessageState createState() => _MessageState();
 }
 
-class _MessageState extends State<Message> {
-  final List<Map<String, dynamic>> messages = [
-    {'text': 'Hello!', 'isUserMessage': false},
-    {'text': 'Hi! How are you?', 'isUserMessage': true},
-    {'text': 'I’m good, thanks!', 'isUserMessage': false},
-    {'text': 'What about you?', 'isUserMessage': false},
-    {'text': 'I’m doing well too.', 'isUserMessage': true},
-  ];
+class _MessageState extends BaseScreenState<MessageScreen> {
+   List<Message> messages =[];
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  void _sendMessage() {
-    if (_messageController.text.isNotEmpty) {
+  final SocketManager socketManager = SocketManager();
+  Future<List<String>> getRoom() async{
+    String userReceiver = widget.user.id;
+    User? user = await getUser();
+    List<String> ids = [userReceiver, user?.id ?? ''];
+    return ids;
+  }
+  @override
+  void initState(){
+    super.initState();
+    getMessage();
+    socketManager.connect((Message message) {
       setState(() {
-        messages.insert(0, {'text':_messageController.text,'isUserMessage':true}); // Thêm tin nhắn mới vào đầu danh sách
+        messages.insert(0,message);
       });
+      _scrollToBottom();
+    },);
+    _initializeRoom();
+  }
+  Future<void> _initializeRoom() async {
+    List<String> room = await getRoom();
+    socketManager.join_room(room);
+  }
+  @override
+  void dispose() {
+    socketManager.disconnect();
+    super.dispose();
+  }
+  Future<void> _sendMessage() async {
+    if (_messageController.text.isNotEmpty) {
+      List<String> room = await getRoom();
+      socketManager.sendMessage(room, _messageController.text);
       _messageController.clear();
-      _scrollController.animateTo(
-        0.0,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
+    }
+  }
+   void _scrollToBottom() {
+     if (_scrollController.hasClients) {
+       _scrollController.animateTo(
+         _scrollController.position.minScrollExtent,
+         duration: const Duration(milliseconds: 300),
+         curve: Curves.easeOut,
+       );
+     }
+   }
+  Future<void> getMessage()async{
+     try{
+       List<String> room = await getRoom();
+      final response = await ApiService.getMessage(room);
+      if(response['message']== "successfully"){
+        print(response);
+        setState(() {
+          messages = parseMessages(response);
+        });
+      }else{
+        setState(() {
+          messages =[];
+        });
+      }
+    }catch(e){
+      print(e);
     }
   }
   @override
-  Widget build(BuildContext context) {
+  Widget buildScreen(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(leadingWidth: 0,
@@ -45,11 +94,11 @@ class _MessageState extends State<Message> {
                 onTap: (){
                   Navigator.pop(context);
                 },),
-              const SizedBox(width: 10,),
-              //   CircleAvatar(backgroundImage: NetworkImage(),
-              //   radius: 18,),
-              // const SizedBox(width:10,),
-              // Text(,style: const TextStyle(fontSize: 18),)
+              const SizedBox(width: 15,),
+                CircleAvatar(backgroundImage: NetworkImage(replaceLocalhost(widget.user.avatar)),
+                radius: 18,),
+              const SizedBox(width:15,),
+              Text(widget.user.name,style: const TextStyle(fontSize: 20),)
             ],
           ),
         ),
@@ -57,11 +106,12 @@ class _MessageState extends State<Message> {
           children: [
             Expanded(
               child: ListView.builder(
+                  controller: _scrollController,
                   reverse: true,
                   itemCount: messages.length,
                   itemBuilder: (context, index){
                     final message = messages[index];
-                    final isUserMessage = message['isUserMessage'] as bool;
+                    final isUserMessage = message.sender.id != widget.user.id;
                     return Align(
                       alignment: isUserMessage
                       ? Alignment.centerRight
@@ -76,7 +126,7 @@ class _MessageState extends State<Message> {
                           bottomLeft: isUserMessage ? const Radius.circular(16) : Radius.zero
                         )
                       ),
-                      child: Text(message['text'],
+                      child: Text(message.content,
                       style: TextStyle(
                         color: isUserMessage ? Colors.white : Colors.black
                       ),
